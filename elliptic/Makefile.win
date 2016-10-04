@@ -18,4 +18,4 @@ unittest.o: unittest.c
 # Clean target
 
 clean :
-		del unittest.o 
+		del unittest.o unittest.obj 
