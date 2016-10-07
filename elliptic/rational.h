@@ -25,30 +25,36 @@ Rational *Ra(Rational *A, Rational *B){
 
     //Should do overflow check here
 
-    result->n = A->n * B->n;
-    if (A->sgn == B->sgn){
-        result->m = ((A->m * B->n) + (A->n * B->m));
-        result->sgn = A->sgn;
+    if (A->m == 0 || A->n == 0 ){
+        result = B; 
+    } else if (B->m == 0 || B->n == 0){
+        result = A;
     } else {
-        if (A->sgn && 1){
-            if ((A->m * B->n) >= (B->m * A->n)){
-                result->m = ((A->m * B->n) - (B->m * A->n));
-                result->sgn = 0;
-            } else {
-                result->m = ((B->m * A->n) - (A->m * B->n));
-                result->sgn = 1;
-            }
+        result->n = A->n * B->n;
+        if (A->sgn == B->sgn){
+            result->m = ((A->m * B->n) + (A->n * B->m));
+            result->sgn = A->sgn;
         } else {
-            if ((A->m * B->n) >= (B->m * A->n)){
-                result->m = ((A->m * B->n) - (B->m * A->n));
-                result->sgn = 1;
+            if (A->sgn && 1){
+                if ((A->m * B->n) >= (B->m * A->n)){
+                    result->m = ((A->m * B->n) - (B->m * A->n));
+                    result->sgn = 0;
+                } else {
+                    result->m = ((B->m * A->n) - (A->m * B->n));
+                    result->sgn = 1;
+                }
             } else {
-                result->m = ((B->m * A->n) - (A->m * B->n));
-                result->sgn = 0;
+                if ((A->m * B->n) >= (B->m * A->n)){
+                    result->m = ((A->m * B->n) - (B->m * A->n));
+                    result->sgn = 1;
+                } else {
+                    result->m = ((B->m * A->n) - (A->m * B->n));
+                    result->sgn = 0;
+                }
             }
         }
     }
-
+    
     //gcd checks should be performed here
 
     return result;

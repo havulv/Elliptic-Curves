@@ -51,6 +51,8 @@ Rational *Rpow(Rational *base, int power){
         base->m = 1;
         base->n = 1;
         return base;
+    } else if (power == 1){
+        return base;
     } else if ((power % 2) == 0){
         return Rpow( Rm(base, base), power/2);
     } else {

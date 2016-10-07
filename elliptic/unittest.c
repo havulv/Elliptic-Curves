@@ -24,16 +24,15 @@ int main(){
     Rational *b = malloc(sizeof(Rational));
     a->sgn = 0;
     b->sgn = 0;
-    a->m = 10;
-    a->n = 10;
+    a->m = 0;
+    a->n = 0;
     b->m = 10;
-    b->n = 10;
+    b->n = 1;
 
     P->x = a;
     P->y = b;
 
-    printf("Assigned Pointsi\n");
-    Rpow(a, 0);
+    printf("Assigned Points\n");
     printf("Rpow works\n");
     if (onCurve(P)){
         printf("The point (0,10) is on the curve\n");
@@ -49,7 +48,8 @@ int main(){
 
     Point *Q;
     Q = dble(P);
-    printf("The doubled point is (%d/%d,%d/%d).\n", Q->x->m, Q->x->n, Q->y->m, Q->x->n);
+    printf("The doubled point is (%s%d/%d, %s%d/%d).\n", Q->x->sgn ? "-" : "+",
+            Q->x->m, Q->x->n, Q->y->sgn ? "-" : "+", Q->y->m, Q->x->n);
 
     Point *R = malloc(sizeof(Point));
     R = padd(P, Q);
@@ -58,7 +58,7 @@ int main(){
         printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was invalid. Check their parameters.",
                 P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n, Q->y->m, Q->y->n);
     } else {
-        printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was invalid. Check their parameters.",
+        printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was valid.",
                 P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n,
                 Q->y->m, Q->y->n, R->x->m, R->x->m, R->y->m, R->y->n);
     }
