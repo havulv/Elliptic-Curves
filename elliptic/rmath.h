@@ -58,4 +58,8 @@ Rational *Rpow(Rational *base, int power){
     }
 }
 
+Rational *overflow(Rational *A){
+    return NULL;
+}
+
 #endif

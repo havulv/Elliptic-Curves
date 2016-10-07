@@ -1,6 +1,9 @@
 
 #include <stdio.h>
-#include "elliptic.h"
+#include "ellipticCurves.h"
+#include "rmath.h"
+#include "rational.h"
+#include "ellipticPoints.h"
 
 int main(){
     printf("Running unittests on elliptic.h\n");

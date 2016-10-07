@@ -7,7 +7,6 @@
 #ifndef ELLIPTICPOINTS_H
 #define ELLIPTICPOINTS_H
 
-
 typedef struct {
     Rational *x;
     Rational *y;
@@ -20,13 +19,22 @@ int Pequal(Point *P, Point *Q){
     return 0;
 }
 
-
 int onCurve(Point *P){
-    return (Rpow(P->y, 2) == (Rpow(P->x,3) + P->E->a * P->x + P->E->b))
+    return (Requal(Rpow(P->y, 2), 
+                (Ra(Rpow(P->x,3), 
+                    RaI(RmI(P->x, P->E->a), 
+                        (long int) P->E->b)
+                    )
+                 )
+            ));
+
 }
 
-long int PntTangent(Point *P){
-    return ((3 * pow(P->x, 2) + P->E->a)/(2 * P->y));
+Rational *PntTangent(Point *P){
+    return ((Rd(RaI(RmI(Rpow(P->x,2), 3),
+                        P->E->a), 
+                    (RmI(P->y, 2))
+                    )));
 }
 
 Point *dble(Point *P){
@@ -36,11 +44,12 @@ Point *dble(Point *P){
     }
     
     if (P->y != 0){
-        Point *R = (Point *) malloc(sizeof(Point));
+        Point *R = malloc(sizeof(Point));
         R->E = P->E;
-        long int lambda = PntTangent(P);
-        R->x = pow(lambda, 2) - (2 * P->x);
-        R->y = lambda * (P->x - R->x) - P->y;
+        Rational *lambda = PntTangent(P);
+        R->x = Rs(Rpow(lambda, 2),
+                    RmI(P->x, 2));
+        R->y = Rs(Rm(lambda, Rs(P->x, R->x)), P->y);
         return R; 
     } else {
         return NULL;
@@ -59,8 +68,8 @@ Point *padd(Point *P, Point *Q){
         return dble(P);
     }
 
-    long int lambda;
-    Point *R = (Point*) malloc(sizeof(Point));
+    Rational *lambda;
+    Point *R = malloc(sizeof(Point));
     R->E = P->E;
 
     if (P->x == Q->x){
@@ -72,13 +81,13 @@ Point *padd(Point *P, Point *Q){
             return NULL;
         }
     } else {
-        lambda = (Q->y - P->y)/(Q->x - P->x);
+        lambda = Rd(Rs(Q->y, P->y), Rs(Q->x, P->x));
     }
 
-    R->x = pow(lambda, 2) - P->x - Q->x; 
-    R->y = lambda * (P->x - R->x) - P->y; 
+    R->x = Rs(Rs(Rpow(lambda, 2), P->x), Q->x); 
+    R->y = Rs(Rm(lambda, Rs(P->x, R->x)), P->y); 
     return R;
 }
 
 
-#ifndef
+#endif
