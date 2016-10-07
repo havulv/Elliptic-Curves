@@ -1,7 +1,10 @@
 /* elliptic point struct header file */
 
+#include "rational.h"
+#include "rmath.h"
 #ifndef ELLIPTIC_H
 #define ELLIPTIC_H
+
 
 typedef struct {
     long int a;
@@ -9,54 +12,23 @@ typedef struct {
 } Curve;
 
 typedef struct {
-    long int x;
-    long int y;
+    Rational *x;
+    Rational *y;
     Curve *E;
 } Point;
 
-long int pow(long int base, int power){
-    if (power < 0){
-        return pow( 1 / base, -power);
-    } else if (power == 0) {
-        return (long int) 1;
-    } else if (power == 1) {
-        return base;
-    } else if ((power % 2) == 0){
-        return pow(base * base, power/2);
-    } else {
-        return pow(base * base, (power-1)/2);
-    }
-}
-
-
 int Cequal(Curve *A, Curve *B){
-    if ((A->a == B->a) && (A->b == B->b)){
-        return 1;
-    } else {
-        return 0;
-    }
+    return ((A->a == B->a) && (A->b == B->b));
 }
 
 int Pequal(Point *P, Point *Q){
     int Cequal(Curve *, Curve *);
-
-    if (Cequal(P->E, Q->E)){
-        if ((P->x == Q->x) && (P->y == Q->y)){
-            return 1;
-        } else {
-            return 0;
-        }
-    } else {
-        return 0;
-    }
+    if (Cequal(P->E, Q->E)) return (Requal(P->x,Q->x) && Requal(P->y,Q->y));
+    return 0;
 }
 
 int onCurve(Point *P){
-    if (pow(P->y, 2) == pow(P->x,3) + P->E->a * P->x + P->E->b){
-        return 1;
-    } else {
-        return 0;
-    }
+    return (pow(P->y, 2) == (pow(P->x,3) + P->E->a * P->x + P->E->b))
 }
 
 long int PntTangent(Point *P){
