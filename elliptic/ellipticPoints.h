@@ -23,7 +23,7 @@ int Pequal(Point *P, Point *Q){
 
 
 int onCurve(Point *P){
-    return (pow(P->y, 2) == (pow(P->x,3) + P->E->a * P->x + P->E->b))
+    return (Rpow(P->y, 2) == (Rpow(P->x,3) + P->E->a * P->x + P->E->b))
 }
 
 long int PntTangent(Point *P){

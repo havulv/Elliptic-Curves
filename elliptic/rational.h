@@ -9,16 +9,13 @@ typedef struct {
     unsigned long int n;
 } Rational;
 
-unsigned long int gcdr(unsigned long int a, unsigned long int b){
-    return a == 0 ? b : gcdr(b%a, a);
-}
-
 // Doesn't check for buffer overflow which is a huge mistake
-int Requal(Rational *a, Rational *b){
-    return (((b->n * a->m) == (a->n * b->m)) && (b->sgn == a->sgn));
+int Requal(Rational *A, Rational *B){
+    return (((B->n * A->m) == (A->n * B->m)) && (B->sgn == A->sgn));
 }
 
-Rational *Rm(Rational *a, Rational *b){
+//Subtract Rationals
+Rational *Rs(Rational *A, Rational *B){
     Rational *Ra(Rational *, Rational *);
     return Ra(a, b);
 }
@@ -26,30 +23,31 @@ Rational *Rm(Rational *a, Rational *b){
 /* There is something to be said for storing values in 
  * "transitionary" memory and then doing gcd checks on them
  * but, in my opinion, this takes up too much memory. */
-Rational *Ra(Rational *a, Rational *b){
+//Add Rationals
+Rational *Ra(Rational *A, Rational *B){
     Rational *result = (Rational*) malloc(sizeof(Rational));
 
     //Should do overflow check here
 
-    result->n = a->n * b->n;
-    if (a->sgn == b->sgn){
-        result->m = ((a->m * b->n) + (a->n * b->m));
-        result->sgn = a->sgn;
+    result->n = A->n * B->n;
+    if (A->sgn == B->sgn){
+        result->m = ((A->m * B->n) + (A->n * B->m));
+        result->sgn = A->sgn;
     } else {
-        if (a->sgn && 1){
-            if ((a->m * b->n) >= (b->m * a->n)){
-                result->m = ((a->m * b->n) - (b->m * a->n));
+        if (A->sgn && 1){
+            if ((A->m * B->n) >= (B->m * A->n)){
+                result->m = ((A->m * B->n) - (B->m * A->n));
                 result->sgn = 0;
             } else {
-                result->m = ((b->m * a->n) - (a->m * b->n));
+                result->m = ((B->m * A->n) - (A->m * B->n));
                 result->sgn = 1;
             }
         } else {
-            if ((a->m * b->n) >= (b->m * a->n)){
-                result->m - ((a->m * b->n) - (b->m * a->n));
+            if ((A->m * B->n) >= (B->m * A->n)){
+                result->m - ((A->m * B->n) - (B->m * A->n));
                 result->sgn = 1;
             } else {
-                result->m = ((b->m * a->n) - (a->m * b->n));
+                result->m = ((B->m * A->n) - (A->m * B->n));
                 result->sgn = 0;
             }
         }
@@ -60,15 +58,29 @@ Rational *Ra(Rational *a, Rational *b){
     return result;
 }
 
-Rational *Rt(Rational *a, Rational *b){
+//Multiply Rationals
+Rational *Rm(Rational *A, Rational *B){
     Rational *result = (Rational*) malloc(sizeof(Rational));
 
     //Should do buffer overflow check here
     //Also should do gcd checks here
 
-    result->m = (a->m * b->m);
-    result->n = (a->n * b->n);
-    result->sgn = (a->sgn ^ b->sgn);
+    result->m = (A->m * B->m);
+    result->n = (A->n * B->n);
+    result->sgn = (A->sgn ^ B->sgn);
+    return result;
+}
+
+//Divide Rationals
+Rational *Rd(Rational *A, Rational*B){
+    Rational *result = (Rational*) malloc(sizeof(Rational));
+
+    //Should do buffer overflow check here
+    //Also should do gcd checks here
+    
+    result->m = (A->m * B->n);
+    result->n = (A->n * B->m);
+    result->sgn = (A->sgn ^ B->sgn);
     return result;
 }
 
