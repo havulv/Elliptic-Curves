@@ -16,7 +16,6 @@ typedef struct {
 
 
 int Pequal(Point *P, Point *Q){
-    int Cequal(Curve *, Curve *);
     if (Cequal(P->E, Q->E)) return (Requal(P->x,Q->x) && Requal(P->y,Q->y));
     return 0;
 }
@@ -31,7 +30,6 @@ long int PntTangent(Point *P){
 }
 
 Point *dble(Point *P){
-    long int PntTangent(Point *);
 
     if (!onCurve(P)){
         return NULL;
@@ -50,10 +48,6 @@ Point *dble(Point *P){
 }
 
 Point *padd(Point *P, Point *Q){
-    int Cequal(Curve *, Curve *);
-    int Pequal(Point *, Point *);
-    long int PntTangent(Point *);
-    Point *dble(Point *);
 
     if (!onCurve(P) || !onCurve(Q)){
         return NULL;

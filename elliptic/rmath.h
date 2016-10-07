@@ -10,11 +10,17 @@ unsigned long int gcdr(unsigned long int a, unsigned long int b){
 }
 
 Rational *reduce(Rational *A){
+    //Because it is gcd it is gaurenteed to be an integer
+    Rational *result = (Rational*) malloc(sizeof(Rational));
     unsigned long int gcd = gcdr(A->m, A->n);
     if (gcd == 1){
-        return A;
+        result = A;
+        return result; 
     } else {
-
+        result->sgn = A->sgn;
+        result->m = A->m / gcd;
+        result->n = A->n / gcd;
+        return result;
     }
 }
 
@@ -32,6 +38,8 @@ long int pow(long int base, int power){
     }
 }
 
+// Maybe reductions should be made, but this could be really
+// expensive in terms of algorithmic time
 Rational *Rpow(Rational *base, int power){
     if (power < 0){
         unsigned long int mid = base->m;

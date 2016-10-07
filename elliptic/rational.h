@@ -16,7 +16,6 @@ int Requal(Rational *A, Rational *B){
 
 //Subtract Rationals
 Rational *Rs(Rational *A, Rational *B){
-    Rational *Ra(Rational *, Rational *);
     return Ra(a, b);
 }
 
