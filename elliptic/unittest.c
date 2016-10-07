@@ -6,6 +6,7 @@
 #include "ellipticPoints.h"
 
 int main(){
+    Rational *Rpow(Rational*, int);
     printf("Running unittests on elliptic.h\n");
 
     printf("Creating curve y**2 = x**3 + 12 * x + 100\n");
@@ -23,17 +24,17 @@ int main(){
     Rational *b = malloc(sizeof(Rational));
     a->sgn = 0;
     b->sgn = 0;
-    a->m = 0;
-    a->n = 0;
-    b->m = 0;
-    b->n = 0;
+    a->m = 10;
+    a->n = 10;
+    b->m = 10;
+    b->n = 10;
 
     P->x = a;
     P->y = b;
 
-    printf("Assigned Points");
-    Rpow(P->y, 0);
-    printf("Rpow works");
+    printf("Assigned Pointsi\n");
+    Rpow(a, 0);
+    printf("Rpow works\n");
     if (onCurve(P)){
         printf("The point (0,10) is on the curve\n");
     } else {

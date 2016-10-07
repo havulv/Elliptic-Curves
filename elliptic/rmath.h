@@ -46,7 +46,7 @@ Rational *Rpow(Rational *base, int power){
         base->m = base->n;
         base->n = mid;
         return Rpow(base, -power);
-    } else if (power = 0){
+    } else if (power == 0){
         base->sgn = 0;
         base->m = 1;
         base->n = 1;
