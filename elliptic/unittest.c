@@ -5,6 +5,8 @@
 #include "rational.h"
 #include "ellipticPoints.h"
 
+#include <time.h>
+
 int main(){
     Rational *Rpow(Rational*, int);
     printf("Running unittests on elliptic.h\n");
@@ -33,7 +35,6 @@ int main(){
     P->y = b;
 
     printf("Assigned Points\n");
-    printf("Rpow works\n");
     if (onCurve(P)){
         printf("The point (0,10) is on the curve\n");
     } else {
@@ -55,13 +56,37 @@ int main(){
     R = padd(P, Q);
 
     if (R == NULL){
-        printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was invalid. Check their parameters.",
+        printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was invalid. Check their parameters.\n",
                 P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n, Q->y->m, Q->y->n);
     } else {
-        printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was valid.",
+        printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was valid.\n",
                 P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n,
                 Q->y->m, Q->y->n, R->x->m, R->x->m, R->y->m, R->y->n);
     }
+
+    Q->x->m = 0;
+    Q->x->n = 0;
+    Q->y->m = 10;
+    Q->y->n = 1;
+
+    clock_t start = clock(), diff;
+    int j = 0;
+    for (int i = 0; i < 1000000; i++){
+        Q = dble(Q); 
+        if (onCurve(Q)){
+            printf("(%d/%d, %d/%d) @ i: %d\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n, i);
+            if (j > 10){
+                break;
+            } else {
+               j = j + 1; 
+            }
+        }
+    }
+    diff = clock() - start;
+    
+    int msec = ( (float) diff * 1000) / CLOCKS_PER_SEC;
+    printf("\npadd took an average of %d seconds %d millisecond\n /\\/\\ clocks: %d\n",
+            msec/1000, msec%1000, diff);
 
     return 0;
 }

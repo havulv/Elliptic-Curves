@@ -38,16 +38,12 @@ Rational *PntTangent(Point *P){
 }
 
 Point *dble(Point *P){
-
-    if (!onCurve(P)){
-        return NULL;
-    }
     
     if (P->y != 0){
         Point *R = malloc(sizeof(Point));
         R->E = P->E;
         Rational *lambda = PntTangent(P);
-        R->x = Rm(Rpow(lambda, 2),
+        R->x = Rs(Rpow(lambda, 2),
                     RmI(P->x, 2));
         R->y = Rs(Rm(lambda, Rs(P->x, R->x)), P->y);
         return R; 
@@ -57,10 +53,6 @@ Point *dble(Point *P){
 }
 
 Point *padd(Point *P, Point *Q){
-
-    if (!onCurve(P) || !onCurve(Q)){
-        return NULL;
-    }
 
     if (Cequal(P->E, Q->E)){
         return NULL;
