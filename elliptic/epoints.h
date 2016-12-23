@@ -1,11 +1,11 @@
 /* Elliptic Points header file */
 
 #include "rational.h"
-#include "ellipticCurves.h"
+#include "ecurves.h"
 #include "rmath.h"
 
-#ifndef ELLIPTICPOINTS_H
-#define ELLIPTICPOINTS_H
+#ifndef EPOINTS_H
+#define EPOINTS_H
 
 typedef struct {
     Rational *x;

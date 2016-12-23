@@ -1,7 +1,7 @@
 /* elliptic point struct header file */
 
-#ifndef ELLIPTICCURVES_H
-#define ELLIPTICCURVES_H
+#ifndef ECURVES_H
+#define ECURVES_H
 
 
 typedef struct {

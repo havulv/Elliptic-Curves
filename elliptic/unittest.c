@@ -1,9 +1,8 @@
 
 #include <stdio.h>
-#include "ellipticCurves.h"
 #include "rmath.h"
 #include "rational.h"
-#include "ellipticPoints.h"
+#include "epoints.h"
 
 #include <time.h>
 
@@ -63,7 +62,13 @@ int main(){
                 P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n,
                 Q->y->m, Q->y->n, R->x->m, R->x->m, R->y->m, R->y->n);
     }
-
+ 
+    free(P);
+    free(a);
+    free(b);
+    free(R);
+    free(M);
+   
     Q->x->m = 0;
     Q->x->n = 0;
     Q->y->m = 10;
@@ -74,16 +79,18 @@ int main(){
     for (int i = 0; i < 1000000; i++){
         Q = dble(Q); 
         if (onCurve(Q)){
-            printf("(%d/%d, %d/%d) @ i: %d\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n, i);
+            printf("ON CURVE: (%d/%d, %d/%d) @ i: %d\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n, i);
             if (j > 10){
                 break;
             } else {
                j = j + 1; 
             }
+        } else {
+            printf("NOT ON CURVE: (%d/%d, %d/%d) @ i: %d\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n, i);
         }
     }
     diff = clock() - start;
-    
+
     int msec = ( (float) diff * 1000) / CLOCKS_PER_SEC;
     printf("\npadd took an average of %d seconds %d millisecond\n /\\/\\ clocks: %d\n",
             msec/1000, msec%1000, diff);
