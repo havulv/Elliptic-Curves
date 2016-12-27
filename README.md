@@ -6,5 +6,5 @@
 # Build Tests With:
 
 ```
-gcc unittest.c
+gcc unittest.c -o [OUTPUT]
 ```
