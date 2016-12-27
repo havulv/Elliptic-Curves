@@ -40,35 +40,35 @@ int main(){
         printf("The point (0,10) is not on the curve\n");
         printf("Eq :: %d/%d**2 = %d/%d**3 + %d/%d * %d + %d\n",
                 P->y->m, P->y->n, P->x->m, P->x->n, P->x->m, P->x->n, P->E->a, P->E->b);
-        printf("Eq :: %d/%d = %d/%d + %d/%d + %d\n",
-                Rpow(P->y, 2)->m, Rpow(P->y, 2)->n, Rpow(P->x, 3)->m, Rpow(P->x, 3)->n,
-                RmI(P->x, P->E->a)->m, RmI(P->x, P->E->a)->n, P->E->b);
         return 0;
     }
 
-    Point *Q;
+    Point *Q = malloc(sizeof(Point));
     Q = dble(P);
     printf("The doubled point is (%s%d/%d, %s%d/%d).\n", Q->x->sgn ? "-" : "+",
             Q->x->m, Q->x->n, Q->y->sgn ? "-" : "+", Q->y->m, Q->x->n);
 
     Point *R = malloc(sizeof(Point));
-    R = padd(P, Q);
+    if (R != NULL) {
+        R = padd(P, Q);
 
-    if (R == NULL){
-        printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was invalid. Check their parameters.\n",
-                P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n, Q->y->m, Q->y->n);
+        if (R == NULL){
+            printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was invalid. Check their parameters.\n",
+                    P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n, Q->y->m, Q->y->n);
+        } else {
+            printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was valid.\n",
+                    P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n,
+                    Q->y->m, Q->y->n, R->x->m, R->x->m, R->y->m, R->y->n);
+        }
     } else {
-        printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was valid.\n",
-                P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n,
-                Q->y->m, Q->y->n, R->x->m, R->x->m, R->y->m, R->y->n);
+        puts("Allocation error on R");
     }
  
     free(P);
-    free(a);
-    free(b);
     free(R);
     free(M);
    
+    puts("Starting iterative tests");
     Q->x->m = 0;
     Q->x->n = 0;
     Q->y->m = 10;
@@ -77,8 +77,10 @@ int main(){
     clock_t start = clock(), diff;
     int j = 0;
     for (int i = 0; i < 1000000; i++){
+        printf("Q + Q = (%d/%d, %d/%d)\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n);
         Q = dble(Q); 
-        if (onCurve(Q)){
+        if (Q == NULL){ break; 
+        } else if (onCurve(Q)){
             printf("ON CURVE: (%d/%d, %d/%d) @ i: %d\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n, i);
             if (j > 10){
                 break;
@@ -87,6 +89,7 @@ int main(){
             }
         } else {
             printf("NOT ON CURVE: (%d/%d, %d/%d) @ i: %d\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n, i);
+            break;
         }
     }
     diff = clock() - start;

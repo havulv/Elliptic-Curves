@@ -1,120 +1,207 @@
 /*Rational number header file */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifndef RATIONAL_H
 #define RATIONAL_H
 
+// Currently 0/0, 0/x, or x/0 is assumed to be zero and treated as such
+// 0 = + ; 1 = -
+// No check for division by zero
 typedef struct {
     unsigned int sgn : 1;
     unsigned long int m;
     unsigned long int n;
 } Rational;
 
-// Doesn't check for buffer overflow which is a huge mistake
+unsigned long int gcdr(unsigned long int a, unsigned long int b){
+    return a == 0 ? b : gcdr(b%a, a);
+}
+
+// Reduce in place. If gcd is 1 nothing happens. Else it reduces by gcdr
+void reduce(Rational *A){
+    //Because it is gcd it is gaurenteed to be an integer
+    unsigned long int gcd = gcdr(A->m, A->n);
+    if (gcd != 1){
+        A->sgn = A->sgn;
+        A->m = A->m / gcd;
+        A->n = A->n / gcd;
+    }
+}
+
+// Check if rational is zero or not
+int Rzero(Rational *A){
+    return ((A->m == 0) || (A->n == 0));
+}
+
+// assumes in irreducible form for wider range of available integers
 int Requal(Rational *A, Rational *B){
-    return (((B->n * A->m) == (A->n * B->m)) && (B->sgn == A->sgn));
+    return ( A->m == B->m ) && ( A->n == B->n) && (B->sgn == A->sgn);
 }
 
 /* There is something to be said for storing values in 
  * "transitionary" memory and then doing gcd checks on them
  * but, in my opinion, this takes up too much memory. */
 //Add Rationals
-Rational *Ra(Rational *A, Rational *B){
-    Rational *result = malloc(sizeof(Rational));
+void *Ra(Rational *result, Rational *A, Rational *B){
 
-    //Should do overflow check here
-
-    if (A->m == 0 || A->n == 0 ){
+    if (Rzero(A)){
         result = B; 
-    } else if (B->m == 0 || B->n == 0){
+    } else if (Rzero(B)){
         result = A;
     } else {
         result->n = A->n * B->n;
+
+        // Overflow integer check
+        unsigned long int x = A->m * B->n;
+        if (x < 0 || x / B->n != A->m) { result = NULL; return NULL; }
+        unsigned long int y = A->n * B->m;
+        if (y < 0 || y / A->n != B->m) { result = NULL; return NULL; }
+
+
+        // Actual addition
         if (A->sgn == B->sgn){
-            result->m = ((A->m * B->n) + (A->n * B->m));
+            result->m = (x + y);
             result->sgn = A->sgn;
         } else {
+            // If A is negative and B is positive
             if (A->sgn && 1){
-                if ((A->m * B->n) >= (B->m * A->n)){
-                    result->m = ((A->m * B->n) - (B->m * A->n));
-                    result->sgn = 0;
-                } else {
-                    result->m = ((B->m * A->n) - (A->m * B->n));
+                // If A is greater than or equal B then result is -
+                if (x >= y){
+                    result->m = (x - y);
                     result->sgn = 1;
+                // Else if A is less than B then result is +
+                } else {
+                    result->m = (y - x);
+                    result->sgn = 0;
                 }
+
+            // If A is positive and B is negative
             } else {
-                if ((A->m * B->n) >= (B->m * A->n)){
-                    result->m = ((A->m * B->n) - (B->m * A->n));
-                    result->sgn = 1;
-                } else {
-                    result->m = ((B->m * A->n) - (A->m * B->n));
+                // If A is greater than or equal B then result is +
+                if (x >= y){
+                    result->m = (x - y);
                     result->sgn = 0;
+                // Else if B is less than B then result is -
+                } else {
+                    result->m = (y - x);
+                    result->sgn = 1;
                 }
             }
         }
     }
-    
-    //gcd checks should be performed here
 
-    return result;
+    // Check for 0 and if not then reduce
+    if ((result->m == 0) || (result->n == 0)){
+        result->m = 0;
+        result->n = 0;
+    } else {
+        reduce(result);
+    }
 }
 
 //Subtract Rationals
-Rational *Rs(Rational *A, Rational *B){
-    B->sgn = (unsigned int) 1;
-    return Ra(A, B);
+void *Rs(Rational *result, Rational *A, Rational *B){
+    result = B;
+    result->sgn = result->sgn ^ 1;
+    Ra(result, A, result);
 }
 
-Rational *RsI(Rational *A, long int S){
-    Rational *Scale = malloc(sizeof(Rational));
+//Subtact integer from Rational
+void *RsI(Rational *Scale, Rational *A, long int S){
+    // Quick check for subtracting nothing
+    if (S == 0) { Scale = A; }
     Scale->sgn = S < 0 ? 1 : 0;
-    Scale->m = (unsigned long int) S;
+
+    // Handle type conversion 
+    if (S < 0) Scale->m  = (unsigned long int) (S * -1);
+    else Scale->m = (unsigned long int) S;
     Scale->n = (unsigned long int) 1;
-    return Rs(A, Scale);
+    Rs(Scale, A, Scale);
 }
 
-Rational *RaI(Rational *A, long int S){
-    Rational *Scale = malloc(sizeof(Rational));
+// Add integer (Could probably just call to subtract
+void *RaI(Rational *Scale, Rational *A, long int S){
+    // quick check for adding nothing
+    if (S == 0) { Scale = A;}
+
     Scale->sgn = S < 0 ? 1 : 0;
-    Scale->m = (unsigned long int) S;
+
+    // Handle conversion from signed to unsigned
+    if (S < 0) Scale->m  = (unsigned long int) (S * -1);
+    else Scale->m = (unsigned long int) S;
     Scale->n = (unsigned long int) 1;
-    return Ra(A, Scale);
+    Ra(Scale, A, Scale);
 }
 
 //Multiply Rationals
-Rational *Rm(Rational *A, Rational *B){
-    Rational *result = malloc(sizeof(Rational));
+// Should I allocate and then return? It is out of local scope.
+void *Rm(Rational *result, Rational *A, Rational *B){
 
-    //Should do buffer overflow check here
-    //Also should do gcd checks here
+    puts("multiplying");
+    // 0 checks for calc skips
+    if (Rzero(A) || Rzero(B)) {
+        result->m = 0;
+        result->n = 0;
+        result->sgn = 0;
+    } else {
 
-    result->m = (A->m * B->m);
-    result->n = (A->n * B->n);
-    result->sgn = (A->sgn ^ B->sgn);
-    return result;
+        unsigned long int x = A->m * B->m;
+        if (x < 0 || x / A->m != B->m) { result = NULL; return NULL; }
+        unsigned long int y = A->n * B->n;
+        if (y < 0 || y / A->n != B->n) { result = NULL; return NULL; }
+
+        result->m = x;
+        result->n = y;
+        result->sgn = (A->sgn ^ B->sgn);
+
+        // Gaurenteed not to be 0
+        reduce(result);
+    }
 }
 
-Rational *RmI(Rational *A, long int S){
-    Rational *Scale = malloc(sizeof(Rational));
+//Multiply an integer and a rational
+void *RmI(Rational *Scale, Rational *A, long int S){
+    puts("initializing");
     Scale->sgn = S < 0 ? 1 : 0;
-    Scale->m = (unsigned long int) S;
+    // Handle conversion from signed to unsigned
+    puts("casting");
+    if (S < 0) Scale->m = (unsigned long int) ( S * -1);
+    else Scale->m = (unsigned long int) S;
     Scale->n = (unsigned long int) 1;
-    return Rm(A, Scale);
+    Rm(Scale, A, Scale);
 }
 
 //Divide Rationals
-Rational *Rd(Rational *A, Rational*B){
-    Rational *result = malloc(sizeof(Rational));
+void *Rd(Rational *result, Rational *A, Rational*B){
+    // Division by 0 returns NULL
+    if (Rzero(B)) { result = NULL; return NULL; }
+    // 0 / x returns 0
+    if (Rzero(A)) { result = A; return NULL; }
 
-    //Should do buffer overflow check here
-    //Also should do gcd checks here
+    // Integer overflow check
+    unsigned long int x = A->m * B->n;
+    if (x < 0 || x / A->m != B->n) { result = NULL; return NULL; }
+    unsigned long int y = A->n * B->m;
+    if (y < 0 || y / A->n != B->m) { result = NULL; return NULL; }
     
-    result->m = (A->m * B->n);
-    result->n = (A->n * B->m);
+    result->m = x;
+    result->n = y;
     result->sgn = (A->sgn ^ B->sgn);
-    return result;
+
+    // Reduce to irreducible form
+    reduce(result);
 }
 
+// Divide by an Integer
+void *RdI(Rational *Scale, Rational *A, long int S) {
+    Scale->sgn = S < 0 ? 1 : 0;
+    // Handle conversion from signed to unsigned
+    if (S < 0) Scale->n = (unsigned long int) (S * -1);
+    else Scale->n = (unsigned long int) S;
+    Scale->m = (unsigned long int) 1;
+    Rd(Scale, A, Scale);
+}
 
 #endif 
