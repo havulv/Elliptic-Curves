@@ -1,8 +1,8 @@
 
 #include <stdio.h>
-#include "rmath.h"
-#include "rational.h"
-#include "epoints.h"
+#include "..\lib\rmath.h"
+#include "..\lib\rational.h"
+#include "..\lib\epoints.h"
 
 #include <time.h>
 
