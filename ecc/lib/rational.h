@@ -28,6 +28,9 @@ unsigned long int gcdr(unsigned long int a, unsigned long int b);
 // In place reduction of Rational to gcd. I.E. Q(sgn, m, n) -> Q(sgn, m/gcd(m,n), n/gcd(m,n)) 
 void reduce(Q *A);
 
+// For float and double conversion, I need to reverse the significand's bits
+unsigned int reverse24(unsigned int x);
+
 // Create the Rational number
 Q* createQ(int sign, unsigned long int a, unsigned long int b);
 
@@ -39,6 +42,54 @@ int equals(Q *A, Q *B);
 
 // free the rational and its data
 void destroyQ(Q *rational);
+
+// double to rational and return a rational
+Q* dToQ(double num);
+
+// double to rational and store in a rational
+void dToQTo(double num, Q *to);
+
+// float to rational and return a rational
+Q* fToQ(float num);
+
+// float to rational and store in a rational
+void fToQTo(float num, Q *to);
+
+// int to rational and return a rational
+Q* intToQ(int num);
+
+// int to rational and store in rational
+void intToQTo(int num, Q *to);
+
+// unsigned int to rational and return a rational
+Q* uintToQ(unsigned int num);
+
+// unsigned int to rational and store in rational
+void uintToQTo(unsigned int num, Q *to);
+
+// long int to rational and return a rational
+Q* lintToQ(long int num);
+
+// long int to rational and store in rational
+void lintToQTo(long int num, Q *to);
+
+// unsigned long int to rational and return a rational
+Q* ulintToQ(unsigned long int num);
+
+// unsigned long int to rational and store in rational
+void ulintToQTo(unsigned long int num, Q *to);
+
+// rational to float and return float pointer
+float* QTof(Q *rational);
+
+// rational to float and store in float
+void QTofTo(Q *rational, float *to);
+
+// rational to double and return double
+double* QTod(Q *rational);
+
+// rational to double and store in double
+void QTodTo(Q *rational, double *to);
 
 // Add two rationals together
 Q* add(Q *A, Q *B);
@@ -121,6 +172,16 @@ void reduce(Q *A){
     }
 }
 
+// Reverse a 32 bit float's significand in place
+unsigned int reverse24(unsigned int x){
+    // Literally, reverse in chunks as 32-bit and shift backwards
+    x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
+    x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
+    x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
+    x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
+    x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
+    return x >> 8; 
+}
 
 Q* createQ(int sign, unsigned long int a, unsigned long int b){
     Q* rat = (Q*) malloc(sizeof(Q));
@@ -151,6 +212,153 @@ int equals(Q *A, Q *B){
 
 void destroyQ(Q *rational){
     free(rational);
+}
+
+// IEEE 754
+Q* dToQ(double num){
+    Q *result = createQ(0,0,0);
+
+    reduce(result);
+    return result;
+}
+
+// IEEE 754
+void dToQTo(double num, Q *to){
+
+    reduce(to);
+}
+
+// IEEE 754
+Q* fToQ(float num){
+    Q *result = createQ(0,0,0);
+    unsigned int exp = (unsigned int) num & 0x7f800000;
+    unsigned int frac = (unsigned int) num & 0x007fffff;
+    result->sgn = (unsigned int) num >> 31;
+
+    // if the significand is not all zeros -> implicit bit
+    if (frac) { 
+        frac |= 0x00800000;
+        // significand translates to 1 + 1/reverse(bits)
+        frac = reverse24(frac) | 0x01000000;
+    }
+    
+    // Exponent equals zero
+    if (!exp) {
+
+    } else if (!(exp ^ 0x7f800000)) { // Exponent = 0xff -> NaN
+        result = NULL;
+    } else { // All other cases
+        0x00; 
+    }
+    result->m;
+    result->n;
+
+    reduce(result);
+    return result;
+}
+
+// IEEE 754
+void fToQTo(float num, Q *to){
+
+    reduce(to);
+}
+
+Q* intToQ(int num){
+    Q *result = createQ(0,0,0);
+    if (num < 0){
+        result->sgn = 1;
+        result->m = (unsigned long int) (-1 * num);
+        result->n = 1;
+    } else {
+        result->sgn = 0;
+        result->m = (unsigned long int) num;
+        result->n = !num ? 1 : 0;
+    }
+    return result;
+}
+
+void intToQTo(int num, Q *to){
+    if (num < 0){
+        to->sgn = 1;
+        to->m = (unsigned long int) (-1 * num);
+        to->n = 1;
+    } else {
+        to->sgn = 0;
+        to->m = (unsigned long int) num;
+        to->n = !num ? 0 : 1;
+    }
+}
+
+Q* uintToQ(unsigned int num){
+    Q *result = createQ(0, (unsigned long int) num, !num ? 0 : 1);
+    return result;
+}
+
+void uintToQTo(unsigned int num, Q *to){
+    to->sgn = 0;
+    to->m = (unsigned long int) num;
+    to->n = !num ? 0 : 1;
+}
+
+Q* lintToQ(long int num){
+    Q *result = createQ(0,0,0);
+    if (num < 0){
+        result->sgn = 1;
+        result->m = (unsigned long int) (-1 * num);
+        result->n = 1;
+    } else {
+        result->sgn = 0;
+        result->m = (unsigned long int) num;
+        result->n = !num ? 1 : 0;
+    }
+    return result;
+}
+
+void lintToQTo(long int num, Q *to){
+    if (num < 0){
+        to->sgn = 1;
+        to->m = (unsigned long int) (-1 * num);
+        to->n = 1;
+    } else {
+        to->sgn = 0;
+        to->m = (unsigned long int) num;
+        to->n = !num ? 0 : 1;
+    }
+}
+
+Q* ulintToQ(unsigned long int num){
+    Q *result = createQ(0, num, !num ? 0 : 1);
+    return result;
+}
+
+void ulintToQTo(unsigned long int num, Q *to){
+    to->sgn = 0;
+    to->m = num;
+    to->n = !num ? 0 : 1;
+}
+
+float* QTof(Q *rational){
+    float *result = malloc(sizeof(float));
+    *result = (float) rational->m / (float) rational->n;
+    if (rational->sgn) *result = *result * -1;
+    return result;
+}
+
+void QTofTo(Q *rational, float *to){
+    *to = (float) rational->m / (float) rational->n;
+    if (rational->sgn) *to = *to * -1;
+}
+
+double* QTod(Q *rational){
+    double *result = malloc(sizeof(double));
+    *result = (double) rational->m / (double) rational->n;
+    if (rational->sgn) *result = *result * -1;
+    return result;
+}
+
+void QTodTo(Q *rational, double *to){
+    *to = (double) rational->m / (double) rational->n;
+    if (rational->sgn) *to = *to * -1;
 }
 
 //Add Rationals
