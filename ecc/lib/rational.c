@@ -483,7 +483,9 @@ Q* divide(Q *A, Q *B){
     Q *result = createQ(0, 0, 0);
 
     // x/0 is a divide by zero error -- 0/x is 0 bc 0/x = 0 * 1/x = 0
-    if (IS_ZERO(B->m, B->n)) { result = NULL;
+    if (IS_ZERO(B->m, B->n)) { 
+        destroyQ(result);
+        result = NULL;
     } else if (IS_ZERO(A->m, A->n)) { copy(A, result);
     } else {
         // Explicit instead of implicit
@@ -507,29 +509,55 @@ void divideTo(Q *p, Q *q, Q *to){
     }
 }
 
-Q* divideInt(Q *A, long int num){
+Q* divideByInt(Q *A, long int num){
     Q *result = createQ(0,0,0);
     
-    if (!num) { result = NULL;
-    } else if (IS_ZERO(A->m, A->n)){;
+    if (!num) {
+        destroyQ(result);
+        result = NULL;
     } else {
-        if (num < 0) {
-            result->sgn = 1;
-            result->m = (unsigned long int) (num * -1);
+        if (IS_ZERO(A->m, A->n)){;
         } else {
-            result->m = (unsigned long int) num;
-        }
-        result->n = 1;
+            if (num < 0) {
+                result->sgn = 1;
+                result->m = (unsigned long int) (num * -1);
+            } else {
+                result->m = (unsigned long int) num;
+            }
+            result->n = 1;
         } 
-    divideTo(A, result);
+        divideTo(A, result, result);
+    }
     return result;
 }
 
-void divideIntTo(Q *to, long int num){
+Q* divideIntBy(long int num, Q *A) {
+    Q *result = createQ(0, 0, 0);
+
+    if (IS_ZERO(A->m, A->n)) {
+        destroyQ(result);
+        result = NULL;
+    } else {
+        if (!num) { ;
+        } else {
+            if (num < 0) {
+                result->sgn = 1;
+                result->m = (unsigned long int) (num * -1);
+            } else {
+                result->m = (unsigned long int) num;
+            }
+            result->n = 1;
+        }
+        divideTo(result, A, result);
+    }
+    return result;
+}
+
+void divideByIntTo(Q *from, long int num, Q *to){
     if (!num) { to = NULL;
     } else {
         Q *result = createQ(0, 0, 0);
-        if (IS_ZERO(to->m, to->n)){ ;
+        if (IS_ZERO(from->m, from->n)){ ;
         } else if (num < 0) {
             result->sgn = 1;
             result->m = (unsigned long int) (num * -1);
@@ -539,7 +567,26 @@ void divideIntTo(Q *to, long int num){
             result->m = (unsigned long int) num;
             result->n = 1;
         }
-        divideTo(result, to);
+        divideTo(from, result, to);
+        destroyQ(result);
+    }
+}
+
+void divideIntByTo(long int num, Q *from, Q *to){
+    if (IS_ZERO(from->m, from->n)) { to = NULL;
+    } else {
+        Q *result = createQ(0, 0, 0);
+        if (!num){ ;
+        } else if (num < 0) {
+            result->sgn = 1;
+            result->m = (unsigned long int) (num * -1);
+            result->n = 1;
+        } else {
+            result->sgn = 0;
+            result->m = (unsigned long int) num;
+            result->n = 1;
+        }
+        divideTo(from, result, to);
         destroyQ(result);
     }
 }

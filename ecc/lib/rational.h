@@ -135,9 +135,11 @@ Q* divide(Q *A, Q *B);
 void divideTo(Q *p, Q *q, Q *to);
 
 // Divide a rational by an integer m/n / s = m/ns
-Q* divideInt(Q *A, long int num);
+Q* divideByInt(Q *A, long int num);
 
 // Divide a rational by an integer and store in rational $to / num -> $to
-void divideIntTo(Q *from, long int num, Q *to);
+void divideByIntTo(Q *from, long int num, Q *to);
+
+void divideIntByTo(long int num, Q *from, Q *to);
 
 #endif 
