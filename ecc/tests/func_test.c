@@ -7,7 +7,7 @@
 #include <time.h>
 
 int main(){
-    Rational *Rpow(Rational*, int);
+    Q *Rpow(Q*, int);
     printf("Running unittests on elliptic.h\n");
 
     printf("Creating curve y**2 = x**3 + 12 * x + 100\n");
@@ -17,12 +17,12 @@ int main(){
 
     printf("Creating point (0,10)\n");
     Point *P = malloc(sizeof(Point));
-    P->x = malloc(sizeof(Rational));
-    P->y = malloc(sizeof(Rational));
+    P->x = malloc(sizeof(Q));
+    P->y = malloc(sizeof(Q));
     P->E = M;
     
-    Rational *a = malloc(sizeof(Rational));
-    Rational *b = malloc(sizeof(Rational));
+    Q *a = malloc(sizeof(Q));
+    Q *b = malloc(sizeof(Q));
     a->sgn = 0;
     b->sgn = 0;
     a->m = 0;
@@ -43,22 +43,22 @@ int main(){
         return 0;
     }
 
-    Point *Q = malloc(sizeof(Point));
-    Q = dble(P);
-    printf("The doubled point is (%s%d/%d, %s%d/%d).\n", Q->x->sgn ? "-" : "+",
-            Q->x->m, Q->x->n, Q->y->sgn ? "-" : "+", Q->y->m, Q->x->n);
+    Point *X = malloc(sizeof(Point));
+    X = dble(P);
+    printf("The doubled point is (%s%d/%d, %s%d/%d).\n", X->x->sgn ? "-" : "+",
+            X->x->m, X->x->n, X->y->sgn ? "-" : "+", X->y->m, X->x->n);
 
     Point *R = malloc(sizeof(Point));
     if (R != NULL) {
-        R = padd(P, Q);
+        R = padd(P, X);
 
         if (R == NULL){
             printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was invalid. Check their parameters.\n",
-                    P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n, Q->y->m, Q->y->n);
+                    P->x->m, P->x->n, P->y->m, P->y->n, X->x->m, X->x->n, X->y->m, X->y->n);
         } else {
             printf("The addition of (%d/%d, %d/%d) and (%d/%d, %d/%d) was valid.\n",
-                    P->x->m, P->x->n, P->y->m, P->y->n, Q->x->m, Q->x->n,
-                    Q->y->m, Q->y->n, R->x->m, R->x->m, R->y->m, R->y->n);
+                    P->x->m, P->x->n, P->y->m, P->y->n, X->x->m, X->x->n,
+                    X->y->m, X->y->n, R->x->m, R->x->m, R->y->m, R->y->n);
         }
     } else {
         puts("Allocation error on R");
@@ -69,26 +69,26 @@ int main(){
     free(M);
    
     puts("Starting iterative tests");
-    Q->x->m = 0;
-    Q->x->n = 0;
-    Q->y->m = 10;
-    Q->y->n = 1;
+    X->x->m = 0;
+    X->x->n = 0;
+    X->y->m = 10;
+    X->y->n = 1;
 
     clock_t start = clock(), diff;
     int j = 0;
     for (int i = 0; i < 1000000; i++){
-        printf("Q + Q = (%d/%d, %d/%d)\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n);
-        Q = dble(Q); 
-        if (Q == NULL){ break; 
-        } else if (onCurve(Q)){
-            printf("ON CURVE: (%d/%d, %d/%d) @ i: %d\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n, i);
+        printf("X + X = (%d/%d, %d/%d)\n", X->x->m, X->x->n, X->y->m, X->y->n);
+        X = dble(X); 
+        if (X == NULL){ break; 
+        } else if (onCurve(X)){
+            printf("ON CURVE: (%d/%d, %d/%d) @ i: %d\n", X->x->m, X->x->n, X->y->m, X->y->n, i);
             if (j > 10){
                 break;
             } else {
                j = j + 1; 
             }
         } else {
-            printf("NOT ON CURVE: (%d/%d, %d/%d) @ i: %d\n", Q->x->m, Q->x->n, Q->y->m, Q->y->n, i);
+            printf("NOT ON CURVE: (%d/%d, %d/%d) @ i: %d\n", X->x->m, X->x->n, X->y->m, X->y->n, i);
             break;
         }
     }
