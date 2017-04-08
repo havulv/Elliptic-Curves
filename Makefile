@@ -8,7 +8,7 @@ CFlAGS=-I$(LDIR)
 _DEPS = ecurves.h epoints.h rational.h rmath.h
 DEPS = $(patsubst %, $(IDIR)/%,$(_DEPS))
 
-elliptic: $(OBJ)
+elliptic.exe: $(OBJ)
 	gcc -o $@ $(DEPS) $(CFLAGS)
 
 .PHONY: all test clean
