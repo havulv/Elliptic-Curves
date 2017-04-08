@@ -8,7 +8,7 @@
 
 // Check for equality between points
 int Pequal(Point *P, Point *M){
-    if (Cequal(P->E, M->E)) return (Requal(P->x, M->x) && Requal(P->y, M->y));
+    if (Cequal(P->E, M->E)) return (equals(P->x, M->x) && equals(P->y, M->y));
     return 0;
 }
 
@@ -21,7 +21,7 @@ int onCurve(Point *P){
 
     printf("x = %d/%d, E->a = %d\n", P->x->m, P->y->n, P->E->a);
     // Begin checks for failures
-    RmI(right, P->x, P->E->a);
+    multiplyIntTo(P->x, P->E->a, right);
     if (right != NULL) {
         printf("right %d/%d\n", right->m, right->n);
         // The cast is necessary because RaI takes a
@@ -34,7 +34,7 @@ int onCurve(Point *P){
             left = Rpow(P->y, 2);
             if (right != NULL && left != NULL) {
                 printf("left %d/%d == right %d/%d\n", left->m, left->n, right->m, right->n);
-                return Requal(left, right);
+                return equals(left, right);
             }
         }
     }
@@ -114,7 +114,7 @@ Point *padd(Point *P, Point *M){
     R->E = P->E;
 
     // Check if the x's are equal to each other
-    if (Requal(P->x, M->x)){
+    if (equals(P->x, M->x)){
         if (Rzero(P->y) && (Rzero(M->y) ^ 1)){
             PntTangent(lambda, M);
         } else if ((Rzero(P->y) ^ 1) && Rzero(M->y)){

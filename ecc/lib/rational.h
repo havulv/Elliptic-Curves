@@ -95,25 +95,25 @@ void QTodTo(Q *rational, double *to);
 Q* add(Q *A, Q *B);
 
 // Add one rational $from into another one $to
-void addTo(Q *from, Q *to);
+void addTo(Q *p, Q *q, Q *to);
 
 // Add an integer to a rational m/n + s = (m + ns)/n
 Q* addInt(Q *A, long int num);
 
 // Add an integer to a rational and store in same rational
-void addIntTo(Q *to, long int num);
+void addIntTo(Q *from, long int num, Q *to);
 
 // Subract two rationals $A from $B A-B
 Q* subtract(Q *A, Q *B);
 
 // Subract two rationals $from - $to -> $to
-void subtractTo(Q *from, Q *to);
+void subtractTo(Q *p, Q *q, Q *to);
 
 // Subtract an integer from a rational
 Q* subtractInt(Q *A, long int num);
 
 // Subtract an integer from a rational and store in same rational
-void subtractIntTo(Q *to, long int num);
+void subtractIntTo(Q *from, long int num, Q *to);
 
 // Multiply Two rationals together
 Q* multiply(Q *A, Q *B);
@@ -126,18 +126,18 @@ void multiplyTo(Q *from1, Q *from2, Q *to);
 Q* multiplyInt(Q *A, long int num);
 
 // Scale a rational by an int and store in same rational
-void multiplyIntTo(Q *to, long int num);
+void multiplyIntTo(Q *from, long int num, Q *to);
 
 // Divide a rational by another rational m/n / b/a = ma/nb
 Q* divide(Q *A, Q *B);
 
 // Divide a rational by another rational and store in to $from / $to -> $to
-void divideTo(Q *from, Q *to);
+void divideTo(Q *p, Q *q, Q *to);
 
 // Divide a rational by an integer m/n / s = m/ns
 Q* divideInt(Q *A, long int num);
 
 // Divide a rational by an integer and store in rational $to / num -> $to
-void divideIntTo(Q *to, long int num);
+void divideIntTo(Q *from, long int num, Q *to);
 
 #endif 
