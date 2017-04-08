@@ -5,9 +5,6 @@
  */
 
 
-#include <stdlib.h>
-#include <stdio.h>
-
 #ifndef RATIONAL_H
 #define RATIONAL_H
 

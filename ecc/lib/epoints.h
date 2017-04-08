@@ -1,9 +1,11 @@
 /* Elliptic Points header file */
-#include "ecurves.h"
-#include "rational.h"
 
 #ifndef EPOINTS_H
 #define EPOINTS_H
+
+#include "ecurves.h"
+#include "rational.h"
+#include <stdlib.h>
 
 // Struct for a point on a rational elliptic curve
 // x, y are rational points, E is the curve assciated with the point

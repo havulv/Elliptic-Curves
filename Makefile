@@ -1,12 +1,12 @@
 TDIR=ecc/tests
 LDIR=ecc/lib
 
-IDIR = ecc/lib
+IDIR = ./ecc/lib/
 CC=gcc
-CFlAGS=-I$(LDIR)
+CFLAGS=-I$(IDIR)
 
 _DEPS = ecurves.c epoints.c rational.c rmath.c
-DEPS = $(patsubst %, $(IDIR)/%,$(_DEPS))
+DEPS = $(patsubst %, $(LDIR)/%,$(_DEPS))
 
 elliptic_test.exe: $(OBJ)
 	gcc -o $@ $(TDIR)/func_test.c $(DEPS) $(CFLAGS)

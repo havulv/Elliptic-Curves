@@ -1,9 +1,10 @@
 /* Rational and integer basic mathematical function implementations */
 
-#include "rational.h"
 
 #ifndef RMATH_H
 #define RMATH_H
+
+#include "rational.h"
 
 long int powli(long int base, int power);
 Q *Rpow(Q *base, int power);
