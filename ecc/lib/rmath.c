@@ -3,17 +3,17 @@
 #include "rmath.h"
 
 
-long int pow(long int base, int power){
+long int powli(long int base, int power){
     if (power < 0){
-        return pow( 1 / (double) base, -power);
+        return powli( 1 / (double) base, -power);
     } else if (power == 0) {
         return (long int) 1;
     } else if (power == 1) {
         return base;
     } else if ((power % 2) == 0){
-        return pow(base * base, power/2);
+        return powli(base * base, power/2);
     } else {
-        return pow(base * base, (power-1)/2);
+        return powli(base * base, (power-1)/2);
     }
 }
 
@@ -34,7 +34,7 @@ Q *Rpow(Q *base, int power){
     } else if ((power % 2) == 0){
         return Rpow( multiply(base, base), power/2);
     } else {
-        return Rpow( multiply(base, base, base), (power-1)/2);
+        return Rpow( multiply(base, multiply(base, base)), (power-1)/2);
     }
 }
 

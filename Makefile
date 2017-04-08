@@ -11,3 +11,5 @@ DEPS = $(patsubst %, $(IDIR)/%,$(_DEPS))
 elliptic: $(OBJ)
 	gcc -o $@ $(DEPS) $(CFLAGS)
 
+.PHONY: all test clean
+
