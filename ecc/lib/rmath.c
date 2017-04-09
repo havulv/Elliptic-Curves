@@ -1,6 +1,6 @@
 
-#include "rational.c"
 #include "rmath.h"
+#include "rational.c"
 
 
 long int powli(long int base, int power){

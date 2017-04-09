@@ -5,7 +5,7 @@ IDIR = ./ecc/lib/
 CC=gcc
 CFLAGS=-I$(IDIR)
 
-_DEPS = ecurves.c epoints.c rational.c rmath.c
+_DEPS = ecurves.c epoints.c rmath.c
 DEPS = $(patsubst %, $(LDIR)/%,$(_DEPS))
 
 elliptic_test.exe: $(OBJ)

@@ -1,8 +1,8 @@
 
+#include "epoints.h"
 #include "rational.h"
 #include "ecurves.h"
 #include "rmath.h"
-#include "epoints.h"
 #include <stdlib.h>
 #include <stdio.h>
 
