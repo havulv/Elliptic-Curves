@@ -3,13 +3,17 @@ LDIR=ecc/lib
 
 IDIR = ecc/lib
 CC=gcc
-CFlAGS=-I$(LDIR)
+CFlAGS=-I$(LDIR) -Wall -O2
 
-_DEPS = ecurves.h epoints.h rational.h rmath.h
+_DEPS = ecurves.c epoints.c rational.c rmat.c
+_HDEPS = ecurves.h epoints.h rational.h rmat.h
 DEPS = $(patsubst %, $(IDIR)/%,$(_DEPS))
+HDEPS = $(patsubst %, $(IDIR)/%,$(_HDEPS))
 
-elliptic: $(OBJ)
-	gcc -o $@ $(DEPS) $(CFLAGS)
+elliptic:
+	gcc $(TDIR)/func_test.c $(DEPS) $(HDEPS) -o $@ $(CFLAGS)
 
 .PHONY: all test clean
 
+clean:
+	rm *.obj *.o
