@@ -13,6 +13,28 @@ int Pequal(Point *P, Point *M){
     return 0;
 }
 
+// Point creation should be handled here instead of by the owner
+Point *createPoint(void) {
+    Point *P = malloc(sizeof(Point));
+    P->x = createQ(0,0,0);
+    P->y = createQ(0,0,0);
+    P->E = malloc(sizeof(long int) * 2);
+    P->E->a = 0;
+    P->E->b = 0;
+    return P;
+}
+
+Point *initPoint(Q *x, Q *y, Curve *E) {
+    Point *ret = createPoint();
+    ret->x->m = x->m;
+    ret->x->n = x->n;
+    ret->y->m = y->m;
+    ret->y->n = y->n;
+    ret->E->a = E->a;
+    ret->E->b = E->b;
+    return ret;
+}
+
 // Check that the x, y coordinates are on the associated curve
 // Curve is assumed to be of Weierstrass normal form
 // y**2 == x**3 + x * a + b
@@ -44,7 +66,7 @@ int onCurve(Point *P){
     return 0;
 }
 
-void *slope(Q *result, Point *P, Point *M) {
+static void *slope(Q *result, Point *P, Point *M) {
     Q *tmp1 = subtract(P->x, M->x);
     Q *tmp2 = subtract(P->y, M->y);
     if ((tmp1 != NULL) && (tmp2 != NULL) && (tmp2->m && tmp2->n )) {
@@ -58,7 +80,7 @@ void *slope(Q *result, Point *P, Point *M) {
 
 // Returns the tangent slope at the point P
 // (x**2 * 3 + a) / (2 * y)
-void *PntTangent(Q *result, Point *P){
+static void *PntTangent(Q *result, Point *P){
     // Begin failure checks
     result = Rpow(P->x, 2);
     if (result != NULL) {
@@ -78,7 +100,7 @@ void *PntTangent(Q *result, Point *P){
 Point *dble(Point *P){
     
     if (P->y->m || P->y->n){
-        Point *R = malloc(sizeof(Point));
+        Point *R = createPoint();
         // Allocation check
         if (R == NULL) {
             free(R);
@@ -94,13 +116,20 @@ Point *dble(Point *P){
         Q *tmp1 = Rpow(lambda, 2);
         Q *tmp2 = multiplyInt(P->x, 2);
         if ((tmp1 != NULL) && (tmp2 != NULL)) {
+            puts("here");
             subtractTo(tmp1, tmp2, R->x);
+            puts("here");
             if ( R->x != NULL) {
                 subtractTo(P->x, R->x, tmp2);
                 if (tmp2 != NULL) {
                     multiplyTo(tmp2, lambda, tmp2);
                     if (tmp2 != NULL) {
                         subtractTo(P->y, tmp2, R->y);
+                        if (R->y != NULL) {
+                            destroyQ(tmp1);
+                            destroyQ(tmp2);
+                            return R;
+                        }
                     }
                 }
             }
@@ -120,7 +149,7 @@ Point *padd(Point *P, Point *M){
     }
 
     Q *lambda = createQ(0,0,0);
-    Point *R = malloc(sizeof(Point));
+    Point *R = createPoint();
     // Allocation check
     if (R == NULL || lambda == NULL) {
         destroyQ(lambda);

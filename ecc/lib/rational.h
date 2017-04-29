@@ -26,7 +26,7 @@ unsigned long int gcdr(unsigned long int a, unsigned long int b);
 void reduce(Q *A);
 
 // For float and double conversion, I need to reverse the significand's bits
-unsigned int reverse24(unsigned int x);
+static unsigned int reverse24(unsigned int x);
 
 // Create the Rational number
 Q* createQ(int sign, unsigned long int a, unsigned long int b);

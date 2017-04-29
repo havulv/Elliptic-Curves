@@ -36,7 +36,7 @@ void reduce(Q *A){
 }
 
 // Reverse a 32 bit float's significand in place
-unsigned int reverse24(unsigned int x){
+static unsigned int reverse24(unsigned int x){
     // Literally, reverse in chunks as 32-bit and shift backwards
     x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
     x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
@@ -299,11 +299,11 @@ void addTo(Q *p, Q *q, Q *to){
 
         // Overflow integer check
         unsigned long int x = p->m * q->n;
-        if (x < 0 || x / q->n != p->m) { to = NULL; return;}
+        if (x < 0 || ((x / q->n) != p->m)) { to = NULL; return;}
         unsigned long int y = p->n * q->m;
-        if (y < 0 || y / p->n != q->m) { to = NULL; return;}
+        if (y < 0 || ((y / p->n) != q->m)) { to = NULL; return;}
         unsigned long int denom = p->n * q->n;
-        if (denom < 0 || denom / p->n != q->n) { to = NULL; return;}
+        if (denom < 0 || ((denom / p->n) != q->n)) { to = NULL; return;}
 
         // Set denominator
         to->n = denom;
