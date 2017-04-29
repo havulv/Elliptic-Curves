@@ -5,8 +5,8 @@ IDIR = ecc/lib
 CC=gcc
 CFlAGS=-I$(LDIR) -Wall -O2
 
-_DEPS = ecurves.c epoints.c rational.c rmat.c
-_HDEPS = ecurves.h epoints.h rational.h rmat.h
+_DEPS = epoints.c rational.c rmath.c
+_HDEPS = ecurves.h epoints.h rational.h rmath.h
 DEPS = $(patsubst %, $(IDIR)/%,$(_DEPS))
 HDEPS = $(patsubst %, $(IDIR)/%,$(_HDEPS))
 
