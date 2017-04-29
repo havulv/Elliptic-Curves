@@ -1,17 +1,18 @@
 TDIR=ecc/tests
 LDIR=ecc/lib
 
-IDIR = ecc/lib
+IDIR = ./ecc/lib/
 CC=gcc
-CFlAGS=-I$(LDIR) -Wall -O2
+CFLAGS=-I$(IDIR)
 
-_DEPS = epoints.c rational.c rmath.c
-_HDEPS = ecurves.h epoints.h rational.h rmath.h
-DEPS = $(patsubst %, $(IDIR)/%,$(_DEPS))
-HDEPS = $(patsubst %, $(IDIR)/%,$(_HDEPS))
+_DEPS = ecurves.c epoints.c rmath.c
+DEPS = $(patsubst %, $(LDIR)/%,$(_DEPS))
 
-elliptic:
-	gcc $(TDIR)/func_test.c $(DEPS) $(HDEPS) -o $@ $(CFLAGS)
+elliptic_test.exe: $(OBJ)
+	gcc -o $@ $(TDIR)/func_test.c $(DEPS) $(CFLAGS)
+
+rational_test.exe: $(OBJ)
+	gcc -o $@ $(TDIR)/rational_test.c $(DEPS) $(CFLAGS)
 
 .PHONY: all test clean
 

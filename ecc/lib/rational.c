@@ -36,7 +36,7 @@ void reduce(Q *A){
 }
 
 // Reverse a 32 bit float's significand in place
-unsigned int reverse24(unsigned int x){
+static unsigned int reverse24(unsigned int x){
     // Literally, reverse in chunks as 32-bit and shift backwards
     x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
     x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
@@ -285,50 +285,53 @@ Q* add(Q *A, Q *B){
     return result;
 }
 
-void addTo(Q *from, Q *to){
+void addTo(Q *p, Q *q, Q *to){
 
-    if (IS_ZERO(from->m, from->n)){;
-    } else if (IS_ZERO(to->m, to->n)){
-        to->sgn = from->sgn;
-        to->m = from->m;
-        to->n = from->n;
+    if (IS_ZERO(p->m, p->n)){
+        to->sgn = q->sgn;
+        to->m = q->m;
+        to->n = q->n;
+    } else if (IS_ZERO(q->m, q->n)){
+        to->sgn = p->sgn;
+        to->m = p->m;
+        to->n = p->n;
     } else {
 
         // Overflow integer check
-        unsigned long int x = from->m * to->n;
-        if (x < 0 || x / to->n != from->m) { to = NULL; return;}
-        unsigned long int y = from->n * to->m;
-        if (y < 0 || y / from->n != to->m) { to = NULL; return;}
-        unsigned long int denom = from->n * to->n;
-        if (denom < 0 || denom / from->n != to->n) { to = NULL; return;}
+        unsigned long int x = p->m * q->n;
+        if (x < 0 || ((x / q->n) != p->m)) { to = NULL; return;}
+        unsigned long int y = p->n * q->m;
+        if (y < 0 || ((y / p->n) != q->m)) { to = NULL; return;}
+        unsigned long int denom = p->n * q->n;
+        if (denom < 0 || ((denom / p->n) != q->n)) { to = NULL; return;}
 
         // Set denominator
         to->n = denom;
 
         // Actual addition
-        if (from->sgn == to->sgn){
+        if (p->sgn == q->sgn){
             to->m = (x + y);
-            to->sgn = from->sgn;
+            to->sgn = p->sgn;
         } else {
-            // If from is negative and to is positive
-            if (from->sgn && 1){
-                // If from is greater than or equal to then to is -
+            // If p is negative and q is positive
+            if (p->sgn){
+                // If p is greater than or equal to q to is -
                 if (x >= y){
                     to->m = (x - y);
                     to->sgn = 1;
-                // Else if from is less than to then to is +
+                // Else if p is less than to q to is +
                 } else {
                     to->m = (y - x);
                     to->sgn = 0;
                 }
 
-            // If from is positive and to is negative
+            // If p is positive and q is negative
             } else {
-                // If from is greater than or equal to then to is +
+                // If p is greater than or equal to q to is +
                 if (x >= y){
                     to->m = (x - y);
                     to->sgn = 0;
-                // Else if to is less than from then to is -
+                // Else if q is less than p then to is -
                 } else {
                     to->m = (y - x);
                     to->sgn = 1;
@@ -350,17 +353,17 @@ Q* addInt(Q *A, long int num){
         result->sgn = 1;
         result->m = (unsigned long int) num * -1;
         result->n = 1;
-        addTo(A, result);
+        addTo(A, result, result);
     } else {
         result->sgn = 0;
         result->m = (unsigned long int) num;
         result->n = 1;
-        addTo(A, result);
+        addTo(A, result, result);
     }
     return result;
 }
 
-void addIntTo(Q *to, long int num){
+void addIntTo(Q *from, long int num, Q *to){
     Q *result = createQ(0, 0, 0);
     // 0 then add nothing
     if (!num){;
@@ -373,7 +376,7 @@ void addIntTo(Q *to, long int num){
         result->m = (unsigned long int) num;
         result->n = 1;
     }        
-    addTo(result, to);
+    addTo(from, result, to);
     destroyQ(result);
 }
 
@@ -381,13 +384,13 @@ Q* subtract(Q *A, Q *B){
     Q *tmp = createQ(0, 0, 0);
     copy(B, tmp);
     tmp->sgn = tmp->sgn ^ 1;
-    addTo(A, tmp);
+    addTo(A, tmp, tmp);
     return tmp;
 }
 
-void subtractTo(Q *from, Q *to){
-    to->sgn = to->sgn ^ 1;
-    addTo(from, to);
+void subtractTo(Q *p, Q *q, Q *to){
+    q->sgn = q->sgn ^ 1;
+    addTo(p, q, to);
 }
 
 Q* subtractInt(Q *A, long int num){
@@ -395,9 +398,9 @@ Q* subtractInt(Q *A, long int num){
     return addInt(A, num);
 }
 
-void subtractIntTo(Q *to, long int num){
+void subtractIntTo(Q *from, long int num, Q *to){
     num = -1 * num;
-    addIntTo(to, num);
+    addIntTo(from, num, to);
 }
 
 Q* multiply(Q *A, Q *B){
@@ -458,7 +461,7 @@ Q* multiplyInt(Q *A, long int num){
     return result;
 }
 
-void multiplyIntTo(Q *to, long int num){
+void multiplyIntTo(Q *from, long int num, Q *to){
     Q *result = createQ(0, 0, 0);
 
     // 0 then set 0 
@@ -472,7 +475,7 @@ void multiplyIntTo(Q *to, long int num){
         result->m = (unsigned long int) num;
         result->n = 1;
     }   
-    multiplyTo(result, to, to);
+    multiplyTo(result, from, to);
     destroyQ(result);
 }
 
@@ -480,7 +483,9 @@ Q* divide(Q *A, Q *B){
     Q *result = createQ(0, 0, 0);
 
     // x/0 is a divide by zero error -- 0/x is 0 bc 0/x = 0 * 1/x = 0
-    if (IS_ZERO(B->m, B->n)) { result = NULL;
+    if (IS_ZERO(B->m, B->n)) { 
+        destroyQ(result);
+        result = NULL;
     } else if (IS_ZERO(A->m, A->n)) { copy(A, result);
     } else {
         // Explicit instead of implicit
@@ -492,40 +497,67 @@ Q* divide(Q *A, Q *B){
     return result;
 }
 
-void divideTo(Q *from, Q *to){
+void divideTo(Q *p, Q *q, Q *to){
 
-    if (IS_ZERO(to->m, to->n)) { to = NULL;
-    } else if (IS_ZERO(from->n, from->n)) { copy(from, to);
+    if (IS_ZERO(q->m, q->n)) { to = NULL;
+    } else if (IS_ZERO(p->m, q->m)) { copy(p, to);
     } else {
-        to->m = to->n;
-        to->n = to->m;
-        multiplyTo(from, from, to);
+        to->sgn = q->sgn;
+        to->m = q->n;
+        to->n = q->m;
+        multiplyTo(p, to, to);
     }
 }
 
-Q* divideInt(Q *A, long int num){
+Q* divideByInt(Q *A, long int num){
     Q *result = createQ(0,0,0);
     
-    if (!num) { result = NULL;
-    } else if (IS_ZERO(A->m, A->n)){;
+    if (!num) {
+        destroyQ(result);
+        result = NULL;
     } else {
-        if (num < 0) {
-            result->sgn = 1;
-            result->m = (unsigned long int) (num * -1);
+        if (IS_ZERO(A->m, A->n)){;
         } else {
-            result->m = (unsigned long int) num;
-        }
-        result->n = 1;
+            if (num < 0) {
+                result->sgn = 1;
+                result->m = (unsigned long int) (num * -1);
+            } else {
+                result->m = (unsigned long int) num;
+            }
+            result->n = 1;
         } 
-    divideTo(A, result);
+        divideTo(A, result, result);
+    }
     return result;
 }
 
-void divideIntTo(Q *to, long int num){
+Q* divideIntBy(long int num, Q *A) {
+    Q *result = createQ(0, 0, 0);
+
+    if (IS_ZERO(A->m, A->n)) {
+        destroyQ(result);
+        result = NULL;
+    } else {
+        if (!num) { ;
+        } else {
+            if (num < 0) {
+                result->sgn = 1;
+                result->m = (unsigned long int) (num * -1);
+            } else {
+                result->m = (unsigned long int) num;
+            }
+            result->n = 1;
+        }
+        divideTo(result, A, result);
+    }
+    return result;
+}
+
+void divideByIntTo(Q *from, long int num, Q *to){
     if (!num) { to = NULL;
     } else {
         Q *result = createQ(0, 0, 0);
-        if (IS_ZERO(to->m, to->n)){ ;
+        if (IS_ZERO(from->m, from->n)){ ;
         } else if (num < 0) {
             result->sgn = 1;
             result->m = (unsigned long int) (num * -1);
@@ -535,7 +567,26 @@ void divideIntTo(Q *to, long int num){
             result->m = (unsigned long int) num;
             result->n = 1;
         }
-        divideTo(result, to);
+        divideTo(from, result, to);
+        destroyQ(result);
+    }
+}
+
+void divideIntByTo(long int num, Q *from, Q *to){
+    if (IS_ZERO(from->m, from->n)) { to = NULL;
+    } else {
+        Q *result = createQ(0, 0, 0);
+        if (!num){ ;
+        } else if (num < 0) {
+            result->sgn = 1;
+            result->m = (unsigned long int) (num * -1);
+            result->n = 1;
+        } else {
+            result->sgn = 0;
+            result->m = (unsigned long int) num;
+            result->n = 1;
+        }
+        divideTo(from, result, to);
         destroyQ(result);
     }
 }

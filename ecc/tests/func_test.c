@@ -1,10 +1,12 @@
 
 #include <stdio.h>
+#include <time.h>
+
 #include "rmath.h"
+#include "ecurves.h"
 #include "rational.h"
 #include "epoints.h"
 
-#include <time.h>
 
 int main(){
     Q *Rpow(Q*, int);
@@ -45,6 +47,10 @@ int main(){
 
     Point *X = malloc(sizeof(Point));
     X = dble(P);
+    if (X == NULL) {
+        printf("Allocation failure\n");
+        return 1;
+    }
     printf("The doubled point is (%s%d/%d, %s%d/%d).\n", X->x->sgn ? "-" : "+",
             X->x->m, X->x->n, X->y->sgn ? "-" : "+", X->y->m, X->x->n);
 
